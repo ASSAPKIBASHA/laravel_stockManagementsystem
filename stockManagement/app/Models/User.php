@@ -12,19 +12,19 @@ class User extends Authenticatable
 
     use HasFactory, Notifiable;
 
-    protected $fillable = [
+    protected $fillable = [//this is also to specify the the fillabbles of the user
         'name',
         'email',
         'password',
     ];
 
 
-    protected $hidden = [
+    protected $hidden = [//these are the data that have to be hidden
         'password',
         'remember_token',
     ];
 
-
+//this is to provide additional data 
     protected function casts(): array
     {
         return [
@@ -35,6 +35,7 @@ class User extends Authenticatable
 
     public function products()
     {
-        return $this->hasMany(Product::class);
+        return $this->hasMany(Product::class);//here one user can 
+        // have many products
     }
 }

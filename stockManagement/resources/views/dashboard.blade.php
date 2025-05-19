@@ -2,9 +2,11 @@
 
 @section('page_title', 'Dashboard')
 
-@section('content')
+@section('content') 
+{{-- ere we are to display the cards  --}}
 <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mt-8">
     <div class="bg-white rounded-lg shadow p-6 flex flex-col items-center">
+        {{-- gettting the real numbers from the db --}}
         <span class="text-gray-900 text-lg font-semibold mb-2">Total Products</span>
         <span class="text-3xl font-bold text-blue-600">{{ $totalProducts }}</span>
     </div>

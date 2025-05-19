@@ -12,10 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('stock_out', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('product_id')->constrained('products')->onDelete('cascade');
-            $table->integer('quantity');
-            $table->timestamps();
+            $table->id();//id also of the stockout
+            $table->foreignId('product_id')->constrained('products')->onDelete('cascade');//this is the fk to allow us to to select the product we are to make stockout 
+            $table->integer('quantity');//this is the removal quantity
+            $table->timestamps();//created at updated at 
         });
     }
 

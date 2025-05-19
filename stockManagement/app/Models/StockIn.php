@@ -9,15 +9,16 @@ class StockIn extends Model
 {
     use HasFactory;
 
-    protected $table = 'stock_in';
+    protected $table = 'stock_in';//i know that 
     
-    protected $fillable = [
+    protected $fillable = [//fillabkles
         'product_id',
         'quantity',
     ];
 
-    public function product()
+    public function product() //here we have only one relationship
+    //  becaouse stocin is related to products only 
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsTo(Product::class);//belongs tooo because stockin are performed on the product
     }
 }

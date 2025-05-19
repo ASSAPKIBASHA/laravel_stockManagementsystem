@@ -9,35 +9,40 @@ use App\Models\User;
 use App\Models\Product;
 use App\Models\StockIn;
 use App\Models\StockOut;
+//because the controllers are more vurunerable to the linking and hard form to understand i opted for this
+//  i instead ignored the controllers and used the loginc in the
 
 
-// Define the login route with a name
+// Guest routes - only accessible if NOT logged in
+// Login route
 Route::get('/', function(){
     if (Auth::check()) {
         return redirect('/dashboard');
     }
     return view('login');
 })->name('login');
-//login fucntionality
+
+// Login processing
 Route::post('/login',function(Request $request){
-   $request->validate([
+   $request->validate([//validate the providede credentials
     "name"=>'required',
     "email"=>'required',
     "password"=>'required'
    ]);
-   $user = User::where('name',$request->name)
-     ->where('email',$request->email)
+   $user = User::where('name',$request->name)//here we fetch from user model and select
+   //  the first record of the db
+     ->where('email',$request->email)//this is also the same as for the email
      ->first();
-     if($user&&Hash::check($request->password, $user->password)){
-        Auth::login($user);
-        return redirect('/dashboard');
+     if($user&&Hash::check($request->password, $user->password)){//here we will check the
+     // password entered and see if it's hash maches with the existing one
+        Auth::login($user);//after user can login
+        return redirect('/dashboard');//see the dashboard
      }
-     return redirect()->route('login')
+     return redirect()->route('login')//else back
      ->withErrors(['login'=>'invalid credentials']);
-
 });
 
-
+// Register form
 Route::get('/register', function(){
     if (Auth::check()) {
         return redirect('/dashboard');
@@ -45,25 +50,26 @@ Route::get('/register', function(){
     return view('register');
 });
 
-//register fucntionality
+// Register processing
 Route::post('/register',function(Request $request){
-    $request->validate([
+    $request->validate([//validating the fields and what to add in them
         "name"=>'required',
         "email"=>'required|email|unique:users',
         "password"=>'required|min:6'
     ]);
-
-    $user = User::create([
-        'name'=>$request->name,
-        'email'=>$request->email,
-        'password'=>Hash::make($request->password),
+//this is for inserting the user values into the db after verifying them
+    $user = User::create([//here we are creating user by User::create()
+        'name'=>$request->name,//we specify where the values are comming from
+        'email'=>$request->email,//email is from email from validate([....])
+        'password'=>Hash::make($request->password),//password after hashing it
     ]);
 
-    Auth::login($user);
-    return redirect('/dashboard');
+    // Redirect to login page instead of automatically logging in
+    return redirect('/')->with('success', 'Registration successful! Please login.');
 });
-// Protected routes
-Route::middleware(['auth'])->group(function() {
+// here we are making routes unacesible unless you re logged in
+Route::middleware(['auth'])->group(function() {//this is by the
+//  use auth middleware to protect group routes so that the
     Route::get('/dashboard', function(){
         $userId = Auth::id();
 
@@ -80,18 +86,20 @@ Route::middleware(['auth'])->group(function() {
             $query->where('user_id', $userId);
         })->sum('quantity');
 
-        // Get current stock level
+        //get the real time stock by dubstracting the outs from ins
         $currentStock = $totalStockIn - $totalStockOut;
 
-        // Get recent stock activities (both in and out) for this user
-        $recentStockIns = StockIn::with('product')
-            ->whereHas('product', function($query) use ($userId) {
+        // Get recent actions from (both in and out) for this the logged in user becaoouse i aadded the userid
+        $recentStockIns = StockIn::with('product')//select the recenc
+        //  stockins from the StckinModel from the fucntion there that shows
+        //  relation ship with the stockin in stckin model
+            ->whereHas('product', function($query) use ($userId) {//here we are retrieving by filtering the user id fk frim the model
                 $query->where('user_id', $userId);
             })
-            ->latest()
+            ->latest()//here we get latest five actions if they are available
             ->take(5)
             ->get()
-            ->map(function($stockIn) {
+            ->map(function($stockIn) {//here weare displaying the product data but here in stcokin
                 return [
                     'product_code' => $stockIn->product->product_code,
                     'product_name' => $stockIn->product->product_name,
@@ -102,14 +110,14 @@ Route::middleware(['auth'])->group(function() {
                 ];
             });
 
-        $recentStockOuts = StockOut::with('product')
-            ->whereHas('product', function($query) use ($userId) {
+        $recentStockOuts = StockOut::with('product')//here it is the same now we are looking to the recent outs and the same idea used here
+            ->whereHas('product', function($query) use ($userId) {//userid of the logged user
                 $query->where('user_id', $userId);
             })
-            ->latest()
+            ->latest()//latest or new five stockouts
             ->take(5)
             ->get()
-            ->map(function($stockOut) {
+            ->map(function($stockOut) {//display the product action was f=done on
                 return [
                     'product_code' => $stockOut->product->product_code,
                     'product_name' => $stockOut->product->product_name,
@@ -293,7 +301,7 @@ Route::middleware(['auth'])->group(function() {
     Route::post('/logout', function() {
         Auth::logout();
         return redirect('/');
-    });
+    })->name('logout');
 
     Route::get('/reports', function(Request $request){
         $userId = Auth::id();

@@ -9,15 +9,15 @@ class StockOut extends Model
 {
     use HasFactory;
 
-    protected $table = 'stock_out';
+    protected $table = 'stock_out';//this is understandable wna
     
     protected $fillable = [
         'product_id',
         'quantity',
     ];
 
-    public function product()
+    public function product()//this is also undetstandable
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsTo(Product::class);//the same as from stockin
     }
 }

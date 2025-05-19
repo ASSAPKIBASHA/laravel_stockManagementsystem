@@ -12,10 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('stock_in', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('product_id')->constrained('products')->onDelete('cascade');
-            $table->integer('quantity');
-            $table->timestamps();
+            $table->id();//this is the id of the stockin
+            $table->foreignId('product_id')->constrained('products')->onDelete('cascade');//this 
+            // is the foreign key from the products table that have to be used while we are
+            // making increase of the quantinty of the produdct 
+            $table->integer('quantity');//this is the quantity that is added by the user 
+            $table->timestamps();//this is created at and updated at
         });
     }
 
